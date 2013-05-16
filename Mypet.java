@@ -7,8 +7,9 @@ import ntu.csie.oop13spring.POOPet;
 
 
 class Mypet extends POOPet {
-    protected int hp,maxhp,ap,maxap,mp,maxmp,state,agility,nation;
-    String subscription;
+    protected int hp,maxhp,ap,maxap,mp,maxmp,state,agility,nation,patk,matk,pdef,mdef;
+    protected int[] turn =new int[32];
+    String subscription,name;
     ImageIcon portrait, fullportrait;
     private Mycoordinate pos;
     @Override
