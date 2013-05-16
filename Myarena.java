@@ -16,50 +16,144 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.SwingConstants;
 import javax.swing.Timer;
 
 import ntu.csie.oop13spring.POOArena;
 import ntu.csie.oop13spring.POOCoordinate;
 import ntu.csie.oop13spring.POOPet;
 
+import java.util.*;
+
 
 public class Myarena extends POOArena{
-    private JFrame Gamebox; 
+    private JFrame frame;
+    private Board place;
+    private JLabel portrait,log,infopanel,skillpanel;
+    private JScrollPane gameprogress;
+    private ImageIcon fullportrait;
+    private String subscription;
+    private int state;
+    private Mycoordinate focuspos;
+    private ArrayList<POOPet> Mypetlist= new ArrayList<POOPet>();
+    GCFrame scene;
     Myarena()
     {
 	super();
-	Gamebox.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	
+	frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	place=new Board();
+	int i,j;
+	frame = new JFrame("Fade out");
+	frame.setLayout(new BorderLayout());
+	scene=new GCFrame();
+	frame.setContentPane(scene);
+	frame.setLayout(new GridBagLayout());
+	GridBagConstraints c1 = new GridBagConstraints();
+	// add player state stuff
+	// portrait
+	c1.gridwidth = 3;
+	c1.gridheight = 4;
+	c1.anchor = GridBagConstraints.WEST;
+	c1.ipadx=10;
+	c1.ipady=10;
+	c1.gridx=0;
+	c1.gridy=0;
+	portrait=new JLabel();
+	portrait.setPreferredSize(new Dimension(215,300));
+	portrait.setOpaque(false);
+	portrait.setBackground(new Color(192,192,192,225));
+	frame.add(portrait,c1);
+	// intro... state
+	c1.gridwidth = 3;
+	c1.gridheight = 4;
+	c1.anchor = GridBagConstraints.WEST;
+	c1.ipadx=10;
+	c1.ipady=0;
+	c1.gridx=0;
+	c1.gridy=4;
+	infopanel=new JLabel();
+	infopanel.setVerticalAlignment(SwingConstants.TOP);
+	infopanel.setPreferredSize(new Dimension(215,300));
+	infopanel.setOpaque(true);
+	infopanel.setBackground(new Color(192,192,192,225));
+	frame.add(infopanel,c1);
+	//add the board
+	c1.gridwidth = 8;
+	c1.gridheight = 8;
+	c1.anchor = GridBagConstraints.CENTER;
+	c1.gridx=4;
+	c1.gridy=0;
+	c1.ipadx=10;
+	c1.ipady=10;
+	Board place=new Board();
+	/*JLabel upper=Board.CreateBoard(25, 25, 25, 185,0);
+	JLabel lower=Board.CreateBoard(192, 192, 192, 185,1);*/
+	//layeredPane.add(lower, 0);
+	frame.add(place.innerboard,c1);
+	//add choose panel
+	skillpanel = new JLabel("Skill Panel");
+	c1.gridwidth = 3;
+	c1.gridheight = 4;
+	c1.anchor = GridBagConstraints.EAST;
+	c1.gridx=11;
+	c1.gridy=0;
+	c1.ipadx=10;
+	c1.ipady=10;
+	skillpanel.setPreferredSize(new Dimension(215,290));
+	skillpanel.setOpaque(true);
+	skillpanel.setBackground(new Color(192,192,192,225));
+	frame.add(skillpanel,c1);
+	//add game scrollpanel
+	c1.gridwidth = 3;
+	c1.gridheight = 4;
+	c1.anchor = GridBagConstraints.EAST;
+	c1.gridx=11;
+	c1.gridy=4;
+	c1.ipadx=10;
+	c1.ipady=10;
+	gameprogress=new JScrollPane();
+	log=new JLabel();
+	log.setText("<html>Welcome to the POOArena!!</html>");
+	log.setVisible(true);
+	log.setOpaque(false);
+	log.setBackground(new Color(192,192,192,225));
+	gameprogress.setPreferredSize(new Dimension(215,300));
+	gameprogress.setOpaque(true);
+	gameprogress.setBackground(new Color(192,192,192,225));
+	frame.add(gameprogress,c1);
+	gameprogress.add(log);
+	frame.setSize(1258, 710);
+	frame.setResizable(false);
+	frame.setLocationRelativeTo(null);
+	frame.setVisible(true);
     }
     public boolean fight()
     {
 	return true;
     }
+    
+    @Override
+    public void addPet(POOPet p)
+    {
+	Mypetlist.add(p);
+    }
     public void show()
     {
-	int i,j;
-	JFrame.setDefaultLookAndFeelDecorated(true);
-	JFrame frame = new JFrame("Fade out");
-	frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	com.sun.awt.AWTUtilities.setWindowOpaque(frame, false); //6u14
-	frame.setLayout(new BorderLayout());
-	frame.setContentPane(new GCFrame());
-	frame.setLayout(new GridBagLayout());
-	GridBagConstraints c1 = new GridBagConstraints();
-	c1.gridwidth = 1;
-	c1.gridheight = 1;
-	c1.fill = GridBagConstraints.BOTH;
-      	c1.anchor = GridBagConstraints.CENTER;
-      	c1.ipadx=0;
-      	c1.ipady=0;
-      	c1.gridx=0;
-      	c1.gridy=0;
-      	Board place=new Board();
-      	frame.add(place.innerboard,c1);
-      	frame.setSize(1258, 710);
-	frame.setResizable(false);
-	frame.setLocationRelativeTo(null);
-	frame.setVisible(true);
+	    //place.stylechange();
+	      /*JFrame.setDefaultLookAndFeelDecorated(true);
+	      JFrame frame = new JFrame();
+	      //com.sun.awt.AWTUtilities.setWindowOpacity(frame, .5f);
+	      com.sun.awt.AWTUtilities.setWindowOpaque(frame, false); //6u14
+	      //1.7.0 frame.setBackground(new Color(0,0,0,0));
+	      frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	      JPanel p = new JPanel();
+	      p.add(new JButton("JButton"));
+	      p.setBackground(new Color(.5f,.8f,.5f,.5f));
+	      frame.getContentPane().add(p);
+	      frame.setSize(320, 240);
+	      frame.setLocationRelativeTo(null);
+	      frame.setVisible(true);*/
     }
     public POOCoordinate getPosition(POOPet p)
     {
@@ -73,7 +167,7 @@ public class Myarena extends POOArena{
 
 
 class GCFrame extends JPanel implements ActionListener {
-    Image myImage = new ImageIcon("a.jpg").getImage();
+    Image myImage = new ImageIcon("./images/a.jpg").getImage();
 
     Timer timer = new Timer(20, this);
 
@@ -98,8 +192,8 @@ class GCFrame extends JPanel implements ActionListener {
     }
     public void actionPerformed(ActionEvent e) {
       alpha += -0.01f;
-      if (alpha <= 0.5f) {
-        alpha = 0.5f;
+      if (alpha <= 0.8f) {
+        alpha = 1f;
         timer.stop();
       }
       repaint();
@@ -135,7 +229,7 @@ class GCFrame extends JPanel implements ActionListener {
       private JLabel CreateBoard(int r,int g,int b,int alpha,int border)
       {
   	    int i,j;
-  	    ImageIcon background=new ImageIcon("game.jpg");
+  	    ImageIcon background=new ImageIcon("./images/game.jpg");
   	    background = new ImageIcon(background.getImage().getScaledInstance(600, 600, BufferedImage.SCALE_SMOOTH));
   	    JLabel board = new JLabel();
   	    //board.setIcon(background);     
