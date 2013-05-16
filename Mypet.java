@@ -22,4 +22,52 @@ class Mypet extends POOPet {
 	// TODO Auto-generated method stub
 	return null;
     }
+    public void setstate(int a)
+    {
+	this.state=a;
+    }
+    public int getstate()
+    {
+	return this.state;
+    }
+    public void setap(int a)
+    {
+	this.ap=a;
+    }
+    public int getap()
+    {
+	return this.ap;
+    }
+    public void sethp(int a)
+    {
+	this.hp=a;
+    }
+    public int gethp()
+    {
+	return this.hp;
+    }
+    public void setmaxap(int a)
+    {
+	this.maxap=a;
+    }
+    public int getmaxap()
+    {
+	return this.maxap;
+    }
+    public void setmp(int a)
+    {
+	this.mp=a;
+    }
+    public int getmp()
+    {
+	return this.mp;
+    }
+    public void setmaxmp(int a)
+    {
+	this.maxmp=a;
+    }
+    public int maxmp()
+    {
+	return this.maxmp;
+    }
 }
