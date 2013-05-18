@@ -9,13 +9,13 @@ import ntu.csie.oop13spring.POOArena;
 import ntu.csie.oop13spring.POOCoordinate;
 
 
-public class harcher extends Mypet{
-    public harcher() throws IOException
+public class paladin extends Mypet{
+    public paladin() throws IOException
     {
 	int i;
 	hp=100;
 	maxhp=100;
-	agility=100;
+	agility=80;
 	ap=6;
 	mp=4;
 	maxap=6;
@@ -28,14 +28,15 @@ public class harcher extends Mypet{
 	mdef=5;
 	portrait=new ImageIcon();
 	fullportrait=new ImageIcon();
+	name="Peacebringer";
 	for(i=0;i<32;i++)
 	{
 	    turn[i]=0;
 	}
-	this.setcoordinate(new Mycoordinate(1,0));
-	name="Holy archer";
-	subscription="Archers that are skillful in range combat<br/>";
-	portrait.setImage(ImageIO.read(new File("./images/archerportrait.jpg")));
-	fullportrait.setImage(ImageIO.read(new File("./images/archer.jpg")));
+	this.setcoordinate(new Mycoordinate(3,0));
+	name="Holy paladin";
+	subscription="Knight that know the knowledge of<br/>light magic<br/>";
+	portrait.setImage(ImageIO.read(new File("./images/paladinportrait.jpg")));
+	fullportrait.setImage(ImageIO.read(new File("./images/paladin.jpg")));
     }
 }

@@ -66,8 +66,67 @@ class Mypet extends POOPet {
     {
 	this.maxmp=a;
     }
-    public int maxmp()
+    public int getmaxmp()
     {
 	return this.maxmp;
+    }
+    public void setagility(int a)
+    {
+	this.agility=a;
+    }
+    public int getagility()
+    {
+	return this.agility;
+    }
+    public Mycoordinate getcoordinate()
+    {
+	return this.pos;
+    }
+    public void setcoordinate(Mycoordinate a)
+    {
+	pos=a;
+    }
+    public String getname()
+    {
+	return this.name;
+    }
+    public ImageIcon getportrait()
+    {
+	return this.portrait;
+    }
+    public String showdescrption()
+    {
+	String ans;
+	ans="<html>"+this.name+"<br/>"+this.subscription;
+	if(this.maxhp/this.hp>=2)
+	{
+	    ans+="hp: <font color='red'>"+this.hp+"/ "+this.maxhp+"</font><br/>";
+	}
+	else if(this.maxhp>this.hp)
+	{
+	    ans+="hp: <font color='yellow'>"+this.hp+"/ "+this.maxhp+"</font><br/>";
+	}
+	else
+	{
+	    ans+="hp: <font color='black'>"+this.hp+"/ "+this.maxhp+"</font><br/>";
+	}
+	if(this.ap==0)
+	{
+	    ans+="ap: <font color='red'>"+this.ap+"/ "+this.maxap+"</font><br/>";
+	}
+	else
+	{
+	    ans+="ap: <font color='black'>"+this.ap+"</font>/ "+this.maxap+"<br/>";
+	}
+	if(this.mp==0)
+	{
+	    ans+="mp: <font color='red'>"+this.mp+"/ "+this.maxmp+"</font><br/>";
+	}
+	else
+	{
+	    ans+="mp: <font color='black'>"+this.mp+"</font>/ "+this.maxmp+"<br/>";
+	}
+	ans+="</html>";
+	return ans;
     }
 }
