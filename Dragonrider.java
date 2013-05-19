@@ -29,7 +29,7 @@ public class Dragonrider extends Mypet{
 	fullportrait=new ImageIcon();
 	this.setcoordinate(new Mycoordinate(3,7));
 	name="Dragon Rider";
-	subscription="<b><font color='red'>(Boss)</font></b> Controled by another player please<br/>A rider that want to test your ability<br/>she may join you if you prove <br/>your strength\n";
+	subscription="<b><font color='red'>(Boss)</font></b> Controled by another player please<br/>A rider that want to test your ability<br/>she may join you if you prove <br/>your strength<br/>";
 	portrait.setImage(ImageIO.read(new File("./images/dragonriderportrait.jpg")));
 	fullportrait.setImage(ImageIO.read(new File("./images/dragonrider.jpg")));
 	action.add((Myskill)new BloodyBite());
