@@ -29,7 +29,7 @@ public class harcher extends Mypet{
 	fullportrait=new ImageIcon();
 	this.setcoordinate(new Mycoordinate(1,0));
 	name="Holy archer";
-	subscription="Archers that are skillful in range combat<br/>";
+	subscription="<b><font color='brown'>(Player)</font></b><br/>Archers that are skillful in range combat<br/>";
 	portrait.setImage(ImageIO.read(new File("./images/archerportrait.jpg")));
 	fullportrait.setImage(ImageIO.read(new File("./images/archer.jpg")));
 	action.add((Myskill)new Light_Arrow());

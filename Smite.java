@@ -8,7 +8,7 @@ public class Smite extends Myskill{
 	maxmulti=50;
 	minmulti=5;
 	name="Smite";
-	description="Cost: 3 ap Range: 0-4 | Big bolt of light power erupt from the ground,damage random alot";
+	description="Cost: 4 ap Range: 0-4 | Big bolt of light power erupt from the ground,damage random alot";
 	pattern=1;
 	special=0;
     }

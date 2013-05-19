@@ -29,7 +29,7 @@ public class paladin extends Mypet{
 	fullportrait=new ImageIcon();
 	this.setcoordinate(new Mycoordinate(3,0));
 	name="Holy paladin";
-	subscription="Knight that know the knowledge of<br/>light magic<br/>";
+	subscription="<b><font color='brown'>(Player)</font></b><br/>Knight that know the knowledge of<br/>light magic<br/>";
 	portrait.setImage(ImageIO.read(new File("./images/paladinportrait.jpg")));
 	fullportrait.setImage(ImageIO.read(new File("./images/paladin.jpg")));
 	action.add((Myskill)new Swordattack());

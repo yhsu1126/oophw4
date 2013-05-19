@@ -29,7 +29,7 @@ public class priest extends Mypet{
 	fullportrait=new ImageIcon();
 	this.setcoordinate(new Mycoordinate(5,0));
 	name="Holy priest";
-	subscription="Priest that holds the secret of<br/>elemental magic<br/>";
+	subscription="<b><font color='brown'>(Player)</font></b><br/>Priest that holds the secret of<br/>elemental magic<br/>";
 	portrait.setImage(ImageIO.read(new File("./images/priestportrait.jpg")));
 	fullportrait.setImage(ImageIO.read(new File("./images/priest.jpg")));
 	action.add((Myskill)new heal());

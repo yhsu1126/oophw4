@@ -9,7 +9,7 @@ import ntu.csie.oop13spring.POOPet;
 
 
 class Mypet extends POOPet {
-    protected int hp,maxhp,ap,maxap,mp,maxmp,agility,nation,patk,matk,pdef,mdef;
+    protected int hp,maxhp,ap,maxap,mp,maxmp,agility,nation,patk,matk,pdef,mdef,dead;
     protected int[] stateaccu=new int[32];
     public ArrayList<Myskill> action=new ArrayList<Myskill>();
     String subscription,name;
@@ -24,6 +24,10 @@ class Mypet extends POOPet {
     protected POOCoordinate move(POOArena arena) {
 	// TODO Auto-generated method stub
 	return null;
+    }
+    public int getnation()
+    {
+	return this.nation;
     }
     public void setap(int a)
     {
@@ -40,6 +44,14 @@ class Mypet extends POOPet {
     public int gethp()
     {
 	return this.hp;
+    }
+    public void setdead(int a)
+    {
+	this.dead=a;
+    }
+    public int getdead()
+    {
+	return this.dead;
     }
     public void setmaxap(int a)
     {
@@ -104,36 +116,36 @@ class Mypet extends POOPet {
     public String showdescrption()
     {
 	String ans;
-	ans="<html>"+this.name+"<br/>"+this.subscription;
+	ans="<html><font color='black'>"+this.name+"<br/>"+this.subscription;
 	if(this.maxhp/this.hp>=2)
 	{
-	    ans+="hp: <font color='red'>"+this.hp+"/ "+this.maxhp+"</font><br/>";
+	    ans+="hp: <font color='red'>"+this.hp+" / "+this.maxhp+"</font><br/>";
 	}
 	else if(this.maxhp>this.hp)
 	{
-	    ans+="hp: <font color='yellow'>"+this.hp+"/ "+this.maxhp+"</font><br/>";
+	    ans+="hp: <font color='yellow'>"+this.hp+" / "+this.maxhp+"</font><br/>";
 	}
 	else
 	{
-	    ans+="hp: <font color='black'>"+this.hp+"/ "+this.maxhp+"</font><br/>";
+	    ans+="hp: <font color='black'>"+this.hp+" / "+this.maxhp+"</font><br/>";
 	}
 	if(this.ap==0)
 	{
-	    ans+="ap: <font color='red'>"+this.ap+"/ "+this.maxap+"</font><br/>";
+	    ans+="<font color='blue'>ap: <font color='red'>"+this.ap+" / "+this.maxap+"</font></font><br/>";
 	}
 	else
 	{
-	    ans+="ap: <font color='black'>"+this.ap+"</font>/ "+this.maxap+"<br/>";
+	    ans+="<font color='blue'>ap: "+this.ap+" / "+this.maxap+"</font><br/>";
 	}
 	if(this.mp==0)
 	{
-	    ans+="mp: <font color='red'>"+this.mp+"/ "+this.maxmp+"</font><br/>";
+	    ans+="<font color='green'>mp: <font color='red'>"+this.mp+" / "+this.maxmp+"</font></font><br/>";
 	}
 	else
 	{
-	    ans+="mp: <font color='black'>"+this.mp+"</font>/ "+this.maxmp+"<br/>";
+	    ans+="<font color='green'>mp: "+this.mp+" / "+this.maxmp+"</font><br/>";
 	}
-	ans+="</html>";
+	ans+="</font></html>";
 	return ans;
     }
 }

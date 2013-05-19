@@ -29,6 +29,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
+import javax.swing.UIManager;
+import javax.swing.border.LineBorder;
+import javax.swing.text.DefaultCaret;
 
 import ntu.csie.oop13spring.POOArena;
 import ntu.csie.oop13spring.POOCoordinate;
@@ -44,14 +47,15 @@ public class Myarena extends POOArena{
     private JScrollPane gameprogress;
     private ImageIcon fullportrait;
     private String subscription;
-    private int state,finished,index,mindamage,maxdamage,minrange,maxrange,pattern,cost,type,special;
+    private int state,finished,index,mindamage,maxdamage,minrange,maxrange,pattern,cost,type,special,shift;
+    private int[] nationtotal=new int[2];
     private Mycoordinate focuspos,cursorpos;
     private ArrayList<Mypet> Mypetlist= new ArrayList<Mypet>();
     private boolean end;
     private String skillname;
     Random randonumber=new Random();
     GCFrame scene;
-    String gamelog="Welcome to POOArena!!\n";
+    String gamelog="Welcome to POOArena!!\n When the player kill the boss\n or boss kill all the players\n the game is over\n Have Fun !!\n";
     public Myarena() throws IOException
     {
 	super();
@@ -135,6 +139,8 @@ public class Myarena extends POOArena{
 	c1.ipadx=10;
 	c1.ipady=10;
 	log=new JTextArea();
+	DefaultCaret caret = (DefaultCaret)log.getCaret();
+	caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 	log.setText(gamelog);
 	log.setOpaque(true);
 	log.setVisible(true);
@@ -147,6 +153,8 @@ public class Myarena extends POOArena{
 	frame.setResizable(false);
 	frame.setLocationRelativeTo(null);
 	frame.setVisible(true);
+	nationtotal[0]=0;
+	nationtotal[1]=0;
     }
     public boolean fight()
     {
@@ -166,30 +174,50 @@ public class Myarena extends POOArena{
 	for(i=0;i<Mypetlist.size();i++)
 	{
 	    place.placeicon(Mypetlist.get(i).getcoordinate().getx(), Mypetlist.get(i).getcoordinate().gety(), Mypetlist.get(i).getportrait(),i+1);
+	    nationtotal[Mypetlist.get(i).getnation()]=nationtotal[Mypetlist.get(i).getnation()]+1;
 	}
 	index=0;
-	while(true)
+	frame.revalidate();
+	JLabel paneltitle=new JLabel();
+	paneltitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+	skillpanel.setLayout(new BoxLayout(skillpanel,BoxLayout.Y_AXIS));
+	skillpanel.add(paneltitle);
+	while(end==true)
 	{
+	    if(Mypetlist.get(index).getdead()==1)
+	    {
+		index++;
+		index=index%Mypetlist.size();
+		continue;
+	    }
 	    focuspos=Mypetlist.get(index).getcoordinate();
+	    paneltitle.setText("Skill of "+Mypetlist.get(index).getname());
+	    place.buttonmanager[focuspos.getx()*8+focuspos.gety()].setBorder(new LineBorder(Color.GREEN, 4));
 	    this.appendlog(Mypetlist.get(index).getname()+" turn\n");
 	    for(i=0;i<skillbutton.size();i++)
-		{
-		    skillpanel.remove(skillbutton.get(i));
-		}
+	    {
+		skillpanel.remove(skillbutton.get(i));
+	    }
 	    skillbutton.clear();
-		skillpanel.revalidate();
-		skillpanel.repaint();
-		skillpanel.setLayout(new BoxLayout(skillpanel,BoxLayout.Y_AXIS));
-		skillpanel.invalidate();
-		if(Mypetlist.get(index).action.size()!=0)
+	    skillpanel.revalidate();
+	    skillpanel.repaint();
+	    skillpanel.invalidate();
+	    if(Mypetlist.get(index).action.size()!=0)
+	    {
+		for(i=0;i<Mypetlist.get(index).action.size();i++)
 		{
-		    for(i=0;i<Mypetlist.get(index).action.size();i++)
+		    JButton innertmp=new JButton(Mypetlist.get(index).action.get(i).name);
+		    innertmp.setToolTipText(Mypetlist.get(index).action.get(i).description);
+		    innertmp.setAlignmentX(Component.CENTER_ALIGNMENT);
+		    final Myskill tmpskill=Mypetlist.get(index).action.get(i);
+		    if(tmpskill.special==4)
 		    {
-			JButton innertmp=new JButton(Mypetlist.get(index).action.get(i).name);
-			innertmp.setToolTipText(Mypetlist.get(index).action.get(i).description);
-			innertmp.setAlignmentX(Component.CENTER_ALIGNMENT);
-			final Myskill tmpskill=Mypetlist.get(index).action.get(i);
-			innertmp.addActionListener(new ActionListener(){
+			if(Mypetlist.get(index).getmaxhp()/Mypetlist.get(index).gethp()<tmpskill.minmulti)
+			{
+			    continue;
+			}
+		    }
+		    innertmp.addActionListener(new ActionListener(){
 
 			    @Override
 			    public void actionPerformed(ActionEvent e) {
@@ -262,6 +290,7 @@ public class Myarena extends POOArena{
 	    }
 	    Mypetlist.get(index).setmp(Mypetlist.get(index).getmaxmp());
 	    Mypetlist.get(index).setap(Mypetlist.get(index).getmaxap());
+	    place.buttonmanager[focuspos.getx()*8+focuspos.gety()].setBorder(UIManager.getBorder("Button.border"));
 	    index++;
 	    index%=Mypetlist.size();
 	}
@@ -292,7 +321,9 @@ public class Myarena extends POOArena{
 		    this.appendlog("move to "+"( "+a.getx()+" , "+a.gety()+" )"+"\n");
 		    place.removeicon(focuspos.getx(), focuspos.gety());
 		    place.placeicon(a.getx(), a.gety(), Mypetlist.get(index).getportrait(),this.index+1);
+		    place.buttonmanager[focuspos.getx()*8+focuspos.gety()].setBorder(UIManager.getBorder("Button.border"));
 		    this.focuspos=a;
+		    place.buttonmanager[focuspos.getx()*8+focuspos.gety()].setBorder(new LineBorder(Color.GREEN,4));
 		    Mypetlist.get(index).setcoordinate(focuspos);
 		    Mypetlist.get(index).setmp(this.Mypetlist.get(index).getmp()-dis);
 		    if(fullportrait==Mypetlist.get(index).fullportrait)
@@ -327,7 +358,9 @@ public class Myarena extends POOArena{
 			{
 			    place.removeicon(focuspos.getx(), focuspos.gety());
 			    place.placeicon(a.getx(), a.gety(), Mypetlist.get(index).getportrait(),this.index+1);
+			    place.buttonmanager[focuspos.getx()*8+focuspos.gety()].setBorder(UIManager.getBorder("Button.border"));
 			    this.focuspos=a;
+			    place.buttonmanager[focuspos.getx()*8+focuspos.gety()].setBorder(new LineBorder(Color.GREEN,4));
 			    Mypetlist.get(index).setcoordinate(focuspos);
 			}
 		}
@@ -354,28 +387,43 @@ public class Myarena extends POOArena{
 		{
 		    if(place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()>0)
 		    {
-			if(type==1)
+			if(this.special!=4)
 			{
-			    this.appendlog("dealing "+damage+" physical damage to \n"+Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).getname()+"\n");
-			    Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).sethp(Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).gethp()-damage);
-			}
-			else if(type==2)
-			{
-			    this.appendlog("dealing "+damage+" magical damage to \n"+Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).getname()+"\n");
-			    Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).sethp(Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).gethp()-damage);
-			}
-			else if(type==3)
-			{
-			    this.appendlog("recover "+damage*-1+" hp to \n"+Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).getname()+"\n");
-			    Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).sethp(Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).gethp()-damage);
-			    if(Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).gethp()>Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).getmaxhp())
+			    if(type==1)
 			    {
-				Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).sethp(Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).getmaxhp());
+				this.appendlog("dealing "+damage+" physical damage to \n"+Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).getname()+"\n");
+			    	Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).sethp(Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).gethp()-damage);
+			   
 			    }
+			    else if(type==2)
+			    {
+				this.appendlog("dealing "+damage+" magical damage to \n"+Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).getname()+"\n");
+				Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).sethp(Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).gethp()-damage);
+			    }
+			    else if(type==3)
+			    {
+				this.appendlog("recover "+damage*-1+" hp to \n"+Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).getname()+"\n");
+				Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).sethp(Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).gethp()-damage);
+				if(Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).gethp()>Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).getmaxhp())
+				{
+				    Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).sethp(Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).getmaxhp());
+				}
+			    }
+			    if(Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).gethp()<=0)
+			    {
+				this.death(cursorpos.getx(), cursorpos.gety(), Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1));
+			    }
+			}
+			else
+			{
+			    this.appendlog("Set a curse on\n"+Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).getname()+"\n");
+			    Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).setap(Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).getap()/mindamage);
+			    Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).setmp(Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).getmp()/mindamage);
 			}
 		    }
 		    else
 		    {
+			damage=0;
 			if(type==1)
 			{
 			    this.appendlog("dealing 0 physical damage to the air!!!!\n");
@@ -392,10 +440,10 @@ public class Myarena extends POOArena{
 		}
 		else if(pattern==2)
 		{
-		    int[] xshift={0,-1,1,0};
-		    int[] yshift={-1,0,0,1};
+		    int[] xshift={0,0,-1,1,0};
+		    int[] yshift={0,-1,0,0,1};
 		    int x,y,total=0;
-		    for(i=0;i<4;i++)
+		    for(i=0;i<5;i++)
 		    {
 			x=cursorpos.getx()+xshift[i];
 			y=cursorpos.gety()+yshift[i];
@@ -403,19 +451,21 @@ public class Myarena extends POOArena{
 			{
 			    if(place.buttonmanager[x*8+y].getstate()>0)
 			    {
-				total=1;
 				if(type==1 && place.buttonmanager[x*8+y].getstate()-1 !=index)
 				{
+				    total=1;
 				    this.appendlog("dealing "+damage+" physical damage to \n"+Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).getname()+"\n");
 				    Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).sethp(Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).gethp()-damage);
 				}
 				else if(type==2 && place.buttonmanager[x*8+y].getstate()-1 !=index)
 				{
+				    total=1;
 				    this.appendlog("dealing "+damage+" magical damage to \n"+Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).getname()+"\n");
 				    Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).sethp(Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).gethp()-damage);
 				}
 				else if(type==3)
 				{
+				    total=1;
 				    this.appendlog("recover "+damage*-1+" hp to \n"+Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).getname()+"\n");
 				    Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).sethp(Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).gethp()-damage);
 				    if(Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).gethp()>Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).getmaxhp())
@@ -423,11 +473,16 @@ public class Myarena extends POOArena{
 					Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).sethp(Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).getmaxhp());
 				    }
 				}
+				if(Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).gethp()<=0)
+				    {
+					this.death(x, y, Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1));
+				    }
 			    }
 			}
 		    }
 		    if(total==0)
 		    {
+			damage=0;
 			if(type==1)
 			{
 			    this.appendlog("dealing 0 physical damage to\n"+"WHOLE LOT OF air!!!!\n");
@@ -444,10 +499,10 @@ public class Myarena extends POOArena{
 		}
 		else if(pattern==3)
 		{
-		    int[] xshift={-1,0,1,-1,1,-1,0,1};
-		    int[] yshift={-1,-1,-1,0,0,1,1,1};
+		    int[] xshift={0,-1,0,1,-1,1,-1,0,1};
+		    int[] yshift={0,-1,-1,-1,0,0,1,1,1};
 		    int x,y,total=0;
-		    for(i=0;i<8;i++)
+		    for(i=0;i<9;i++)
 		    {
 			x=cursorpos.getx()+xshift[i];
 			y=cursorpos.gety()+yshift[i];
@@ -475,11 +530,16 @@ public class Myarena extends POOArena{
 					Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).sethp(Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).getmaxhp());
 				    }
 				}
+				if(Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).gethp()<=0)
+				    {
+					this.death(x, y, Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1));
+				    }
 			    }
 			}
 		    }
 		    if(total==0)
 		    {
+			damage=0;
 			if(type==1)
 			{
 			    this.appendlog("dealing 0 physical damage to\n"+"WHOLE LOT OF air!!!!\n");
@@ -492,6 +552,16 @@ public class Myarena extends POOArena{
 			{
 			    this.appendlog("recover 0 hp for\n"+"WHOLE LOT OF air!!!!\n");
 			}
+		    }
+		}
+		if(damage>0 && special==3)
+		{
+		    int leech=this.randonumber.nextInt(damage);
+		    this.appendlog("Steal "+leech+"Life\n");
+		    Mypetlist.get(index).sethp(Mypetlist.get(index).gethp()+leech);
+		    if(Mypetlist.get(index).gethp()>Mypetlist.get(index).getmaxhp())
+		    {
+			Mypetlist.get(index).sethp(Mypetlist.get(index).getmaxhp());
 		    }
 		}
 		Mypetlist.get(index).setap(Mypetlist.get(index).getap()-cost);
@@ -553,14 +623,23 @@ public class Myarena extends POOArena{
 		}
 		Mypetlist.get(index).setap(Mypetlist.get(index).getap()-cost);
 		this.state=1;
+		this.place.removeblanket();
 		if(fullportrait==Mypetlist.get(index).fullportrait)
 		{
 		    infopanel.setText(Mypetlist.get(index).showdescrption());
 		}
+		
 		return;
 	    }
+	    else if(special==4)
+	    {
+		if(Mypetlist.get(index).getmaxhp()/Mypetlist.get(index).gethp()<2);
+		{
+		    return;
+		}
+	    }
 	    place.setBlanket(minrange,maxrange,this.focuspos);
-    }
+    }	
     public void cursorchange(Mycoordinate a)
     {
 	this.cursorpos=a;
@@ -621,13 +700,49 @@ public class Myarena extends POOArena{
 	    }
 	}
     }
-    /*public Mycoordinate getPosition(POOPet p)
+    public void cancelclick()
     {
-	
-    }*/
+	if(state==2)
+	{
+	    place.removeblanket();
+	    state=1;
+	}
+    }
     public int Manhattan(Mycoordinate source,Mycoordinate destin)
     {
 	return Math.abs(source.getx()-destin.getx())+Math.abs(source.gety()-destin.gety());
+    }
+    public void death(int x, int y,Mypet p)
+    {
+	this.appendlog(p.getname()+" is dead\n");
+	this.place.removeicon(x,y);
+	p.setdead(1);
+	nationtotal[p.getnation()]=nationtotal[p.getnation()]-p.getmaxhp();
+	if(nationtotal[p.getnation()]<=0)
+	{
+	    if(p.getnation()==1)
+	    {
+		appendlog("the boss win!!\nBye Bye\nExit in 3 secs");
+	    }
+	    else
+	    {
+		appendlog("the player win!!\nCongratulations!!\nExit in 3 secs");
+	    }
+	    place.setinvalid();
+	    int i;
+	    for(i=0;i<skillbutton.size();i++)
+	    {
+		skillbutton.get(i).setEnabled(false);
+	    }
+	    end=false;
+	    try {
+		Thread.sleep(3000);
+	    } catch (InterruptedException e) {
+		// TODO Auto-generated catch block
+		System.exit(0);
+	    }
+	    System.exit(0);
+	}
     }
 }
 
@@ -675,7 +790,14 @@ class GCFrame extends JPanel implements ActionListener {
     @Override
     public void mouseClicked(MouseEvent e) {
 	// TODO Auto-generated method stub
+	if(e.getButton()==MouseEvent.BUTTON1)
+	{
 	    this.controller.tellarenaclick();
+	}
+	else if(e.getButton()==MouseEvent.BUTTON3)
+	{
+	    this.controller.cancelarenaclick();
+	}
     }
 
     @Override
@@ -754,6 +876,10 @@ class GCFrame extends JPanel implements ActionListener {
     public void tellarenacursor()
     {
 	this.arena.cursorchange(this.pos);
+    }
+    public void cancelarenaclick()
+    {
+	this.arena.cancelclick();
     }
     public Mycoordinate getpos()
     {
@@ -865,6 +991,14 @@ class GCFrame extends JPanel implements ActionListener {
       public int Manhattan(Mycoordinate source,Mycoordinate destin)
       {
   	return Math.abs(source.getx()-destin.getx())+Math.abs(source.gety()-destin.gety());
+      }
+      public void setinvalid()
+      {
+	  int i;
+	  for(i=0;i<64;i++)
+	  {
+	      this.buttonmanager[i].setEnabled(false);
+	  }
       }
   }
   
