@@ -1,0 +1,9 @@
+#!/bin/sh
+
+ARENA_CLASS=Myarena
+PET1_CLASS=harcher
+PET2_CLASS=priest
+PET3_CLASS=paladin
+PET4_CLASS=Dragonrider
+
+java -jar hw4.jar $ARENA_CLASS $PET1_CLASS $PET2_CLASS $PET3_CLASS $PET4_CLASS

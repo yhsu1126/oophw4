@@ -226,28 +226,28 @@ public class Myarena extends POOArena{
 		    final Myskill tmpskill=Mypetlist.get(index).action.get(i);
 		    if(tmpskill.special==4)
 		    {
-			if(Mypetlist.get(index).getmaxhp()/Mypetlist.get(index).gethp()<tmpskill.minmulti)
-			{
-			    continue;
-			}
+				if(Mypetlist.get(index).getmaxhp()/Mypetlist.get(index).gethp()<tmpskill.minmulti)
+				{
+					continue;
+				}
 		    }
 		    innertmp.addActionListener(new ActionListener(){
 
 			    @Override
 			    public void actionPerformed(ActionEvent e) {
-				if(Mypetlist.get(place.buttonmanager[focuspos.getx()*8+focuspos.gety()].getstate()-1).getap()>=tmpskill.cost)
-				{
-				    changetostate2(tmpskill.minmulti,tmpskill.maxmulti,tmpskill.pattern,tmpskill.minrange,tmpskill.maxrange,tmpskill.cost,tmpskill.type,tmpskill.name,tmpskill.special);
-				}
-				else
-				{
-				    appendlog("Not enough action point to do the action\n");
-				    Object tmp=e.getSource();
-				    if(tmp instanceof JButton)
-				    {
-					((JButton) tmp).setEnabled(false);
-				    }
-				}
+					if(Mypetlist.get(place.buttonmanager[focuspos.getx()*8+focuspos.gety()].getstate()-1).getap()>=tmpskill.cost)
+					{
+						changetostate2(tmpskill.minmulti,tmpskill.maxmulti,tmpskill.pattern,tmpskill.minrange,tmpskill.maxrange,tmpskill.cost,tmpskill.type,tmpskill.name,tmpskill.special);
+					}
+					else
+					{
+						appendlog("Not enough action point to do the action\n");
+						Object tmp=e.getSource();
+						if(tmp instanceof JButton)
+						{
+						((JButton) tmp).setEnabled(false);
+						}
+					}
 			    }
 			});
 			skillpanel.add(innertmp);
@@ -262,11 +262,11 @@ public class Myarena extends POOArena{
 
 		    @Override
 		    public void actionPerformed(ActionEvent e) {
-			if(state==2)
-			{
-			place.removeblanket();
-			state=1;
-			}
+				if(state==2)
+				{
+				place.removeblanket();
+				state=1;
+				}
 		    }
 		});
 		skillpanel.add(tmp);
@@ -312,7 +312,7 @@ public class Myarena extends POOArena{
     }
     public POOCoordinate getPosition(POOPet p)
     {
-	return null;
+		return null;
     }
     public void setfinished(int a)
     {
@@ -716,11 +716,15 @@ public class Myarena extends POOArena{
     }
     public void cancelclick()
     {
-	if(state==2)
-	{
-	    place.removeblanket();
-	    state=1;
-	}
+		if(state==2)
+		{
+			place.removeblanket();
+			state=1;
+		}
+		else if(state==1)
+		{
+			setfinished(1);
+		}
     }
     public int Manhattan(Mycoordinate source,Mycoordinate destin)
     {
