@@ -187,7 +187,9 @@ public class Myarena extends POOArena{
 	    nationtotal[Mypetlist.get(i).getnation()]=nationtotal[Mypetlist.get(i).getnation()]+Mypetlist.get(i).getmaxhp();
 	}
 	index=0;
-	frame.revalidate();
+	//frame.revalidate();
+	frame.invalidate();
+	frame.validate();
 	JLabel paneltitle=new JLabel();
 	paneltitle.setAlignmentX(Component.CENTER_ALIGNMENT);
 	skillpanel.setLayout(new BoxLayout(skillpanel,BoxLayout.Y_AXIS));
@@ -213,7 +215,9 @@ public class Myarena extends POOArena{
 		skillpanel.remove(skillbutton.get(i));
 	    }
 	    skillbutton.clear();
-	    skillpanel.revalidate();
+	    //skillpanel.revalidate();
+		skillpanel.invalidate();
+		skillpanel.validate();
 	    skillpanel.repaint();
 	    skillpanel.invalidate();
 	    if(Mypetlist.get(index).action.size()!=0)
@@ -286,7 +290,9 @@ public class Myarena extends POOArena{
 		});
 		skillpanel.add(tmp);
 		skillbutton.add(tmp);
-		skillpanel.revalidate();
+		//skillpanel.revalidate();
+		skillpanel.invalidate();
+		skillpanel.validate();
 	    finished=0;
 	    state=1;
 	    // state 1 waiting for command, state 2 doing skill;
