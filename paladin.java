@@ -13,25 +13,27 @@ public class paladin extends Mypet{
     public paladin() throws IOException
     {
 	int i;
-	hp=100;
-	maxhp=100;
+	hp=150;
+	maxhp=150;
 	agility=80;
 	ap=6;
 	mp=4;
 	maxap=6;
 	maxmp=4;
 	nation=1;
-	patk=20;
-	matk=0;
+	patk=30;
+	matk=10;
 	pdef=5;
 	mdef=5;
 	portrait=new ImageIcon();
 	fullportrait=new ImageIcon();
-	name="Peacebringer";
 	this.setcoordinate(new Mycoordinate(3,0));
 	name="Holy paladin";
 	subscription="Knight that know the knowledge of<br/>light magic<br/>";
 	portrait.setImage(ImageIO.read(new File("./images/paladinportrait.jpg")));
 	fullportrait.setImage(ImageIO.read(new File("./images/paladin.jpg")));
+	action.add((Myskill)new Swordattack());
+	action.add((Myskill)new Jump());
+	action.add((Myskill)new light_heal());
     }
 }

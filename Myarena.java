@@ -195,7 +195,7 @@ public class Myarena extends POOArena{
 			    public void actionPerformed(ActionEvent e) {
 				if(Mypetlist.get(place.buttonmanager[focuspos.getx()*8+focuspos.gety()].getstate()-1).getap()>=tmpskill.cost)
 				{
-				    changetostate2(tmpskill.minmulti,tmpskill.maxmulti,tmpskill.pattern,tmpskill.minrange,tmpskill.maxrange,tmpskill.cost,tmpskill.type,tmpskill.name,0);
+				    changetostate2(tmpskill.minmulti,tmpskill.maxmulti,tmpskill.pattern,tmpskill.minrange,tmpskill.maxrange,tmpskill.cost,tmpskill.type,tmpskill.name,tmpskill.special);
 				}
 				else
 				{
@@ -316,6 +316,21 @@ public class Myarena extends POOArena{
 	    int i,j,dis=this.Manhattan(this.cursorpos, this.focuspos),damage;
 	    if(dis<=maxrange && dis>=minrange)
 	    {
+		if(special==1)
+		{
+			if(place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()>0)
+			{
+			    appendlog("You can't teleport to the spot");
+			    return;
+			}
+			else
+			{
+			    place.removeicon(focuspos.getx(), focuspos.gety());
+			    place.placeicon(a.getx(), a.gety(), Mypetlist.get(index).getportrait(),this.index+1);
+			    this.focuspos=a;
+			    Mypetlist.get(index).setcoordinate(focuspos);
+			}
+		}
 		this.appendlog("use "+this.skillname+" at "+"( "+a.getx()+" , "+a.gety()+" )"+"\n");
 		int multi=this.randonumber.nextInt(this.maxdamage-this.mindamage)+this.mindamage;
 		int patk=this.Mypetlist.get(index).getpatk(),matk=this.Mypetlist.get(index).getmatk();
@@ -351,7 +366,7 @@ public class Myarena extends POOArena{
 			}
 			else if(type==3)
 			{
-			    this.appendlog("recover "+damage*-1+" hp to \n"+Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()).getname()+"\n");
+			    this.appendlog("recover "+damage*-1+" hp to \n"+Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).getname()+"\n");
 			    Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).sethp(Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).gethp()-damage);
 			    if(Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).gethp()>Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).getmaxhp())
 			    {
@@ -378,7 +393,7 @@ public class Myarena extends POOArena{
 		else if(pattern==2)
 		{
 		    int[] xshift={0,-1,1,0};
-		    int[] yshift={1,0,0,-1};
+		    int[] yshift={-1,0,0,1};
 		    int x,y,total=0;
 		    for(i=0;i<4;i++)
 		    {
@@ -389,19 +404,19 @@ public class Myarena extends POOArena{
 			    if(place.buttonmanager[x*8+y].getstate()>0)
 			    {
 				total=1;
-				if(type==1)
+				if(type==1 && place.buttonmanager[x*8+y].getstate()-1 !=index)
 				{
 				    this.appendlog("dealing "+damage+" physical damage to \n"+Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).getname()+"\n");
 				    Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).sethp(Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).gethp()-damage);
 				}
-				else if(type==2)
+				else if(type==2 && place.buttonmanager[x*8+y].getstate()-1 !=index)
 				{
 				    this.appendlog("dealing "+damage+" magical damage to \n"+Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).getname()+"\n");
 				    Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).sethp(Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).gethp()-damage);
 				}
 				else if(type==3)
 				{
-				    this.appendlog("recover "+damage*-1+" hp to \n"+Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()).getname()+"\n");
+				    this.appendlog("recover "+damage*-1+" hp to \n"+Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).getname()+"\n");
 				    Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).sethp(Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).gethp()-damage);
 				    if(Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).gethp()>Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).getmaxhp())
 				    {
@@ -453,7 +468,7 @@ public class Myarena extends POOArena{
 				}
 				else if(type==3)
 				{
-				    this.appendlog("recover "+damage*-1+" hp to \n"+Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()).getname()+"\n");
+				    this.appendlog("recover "+damage*-1+" hp to \n"+Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).getname()+"\n");
 				    Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).sethp(Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).gethp()-damage);
 				    if(Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).gethp()>Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).getmaxhp())
 				    {
@@ -482,6 +497,10 @@ public class Myarena extends POOArena{
 		Mypetlist.get(index).setap(Mypetlist.get(index).getap()-cost);
 		this.place.removeblanket();
 		this.state=1;
+		if(fullportrait==Mypetlist.get(index).fullportrait)
+		{
+		    infopanel.setText(Mypetlist.get(index).showdescrption());
+		}
 	    }
 	}
     }
@@ -497,6 +516,49 @@ public class Myarena extends POOArena{
 	    this.type=type;
 	    this.skillname=skillname;
 	    this.special=special;
+	    if(this.special==2)
+	    {
+		this.appendlog("use "+this.skillname+"\n");
+		int multi;
+		int patk=this.Mypetlist.get(index).getpatk(),matk=this.Mypetlist.get(index).getmatk(),damage;
+		int i;
+		for(i=0;i<Mypetlist.size();i++)
+		{
+		    multi=this.randonumber.nextInt(this.maxdamage-this.mindamage)+this.mindamage;
+		    if(type==1) // patk
+		    {
+			damage=patk*multi/100;
+		    }
+		    else if(type==2) //matk
+		    {
+			damage=matk*multi/100;
+		    }
+		    else if (type==3) // heal
+		    {
+			damage=matk*multi/100*-1;
+		    }
+		    else
+		    {
+			damage=0;
+		    }
+		    if(Mypetlist.get(i).nation==Mypetlist.get(index).nation)
+		    {
+			this.appendlog("recover "+damage*-1+" hp to \n"+Mypetlist.get(i).getname()+"\n");
+			Mypetlist.get(i).sethp(Mypetlist.get(i).gethp()-damage);
+			    if(Mypetlist.get(i).gethp()>Mypetlist.get(i).getmaxhp())
+			    {
+				Mypetlist.get(i).sethp(Mypetlist.get(i).getmaxhp());
+			    }
+		    }
+		}
+		Mypetlist.get(index).setap(Mypetlist.get(index).getap()-cost);
+		this.state=1;
+		if(fullportrait==Mypetlist.get(index).fullportrait)
+		{
+		    infopanel.setText(Mypetlist.get(index).showdescrption());
+		}
+		return;
+	    }
 	    place.setBlanket(minrange,maxrange,this.focuspos);
     }
     public void cursorchange(Mycoordinate a)
@@ -543,9 +605,9 @@ public class Myarena extends POOArena{
 		else if(pattern==2)
 		{
 		    int[] xshift={0,-1,1,0};
-		    int[] yshift={1,0,0,-1};
+		    int[] yshift={-1,0,0,1};
 		    int x,y;
-		    for(i=0;i<8;i++)
+		    for(i=0;i<4;i++)
 		    {
 			x=cursorpos.getx()+xshift[i];
 			y=cursorpos.gety()+yshift[i];

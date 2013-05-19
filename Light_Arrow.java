@@ -11,5 +11,6 @@ public class Light_Arrow extends Myskill{
 	name="Light arrow";
 	description="Cost: 2 ap Range: 2~8 | A single light arrow that deal small damage";
 	pattern=1;
+	special=0;
     }
 }

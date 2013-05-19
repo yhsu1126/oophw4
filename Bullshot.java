@@ -11,5 +11,6 @@ public class Bullshot extends Myskill{
 	name="Bullshot";
 	description="Cost: 4 ap Range: 1~3 | Powerful shoot";
 	pattern=1;
+	special=0;
     }
 }
