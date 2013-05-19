@@ -158,6 +158,16 @@ public class Myarena extends POOArena{
     }
     public boolean fight()
     {
+	if(end==false)
+	{
+	    try {
+		Thread.sleep(3000);
+	    } catch (InterruptedException e) {
+		// TODO Auto-generated catch block
+		System.exit(0);
+	    }
+	    System.exit(0);
+	}
 	return end;
     }
     
@@ -174,7 +184,7 @@ public class Myarena extends POOArena{
 	for(i=0;i<Mypetlist.size();i++)
 	{
 	    place.placeicon(Mypetlist.get(i).getcoordinate().getx(), Mypetlist.get(i).getcoordinate().gety(), Mypetlist.get(i).getportrait(),i+1);
-	    nationtotal[Mypetlist.get(i).getnation()]=nationtotal[Mypetlist.get(i).getnation()]+1;
+	    nationtotal[Mypetlist.get(i).getnation()]=nationtotal[Mypetlist.get(i).getnation()]+Mypetlist.get(i).getmaxhp();
 	}
 	index=0;
 	frame.revalidate();
@@ -194,6 +204,10 @@ public class Myarena extends POOArena{
 	    paneltitle.setText("Skill of "+Mypetlist.get(index).getname());
 	    place.buttonmanager[focuspos.getx()*8+focuspos.gety()].setBorder(new LineBorder(Color.GREEN, 4));
 	    this.appendlog(Mypetlist.get(index).getname()+" turn\n");
+	    this.fullportrait=Mypetlist.get(index).fullportrait;
+	    this.lportrait.setIcon(fullportrait);
+	    this.infopanel.setText(Mypetlist.get(index).showdescrption());
+	    this.infopanel.repaint();
 	    for(i=0;i<skillbutton.size();i++)
 	    {
 		skillpanel.remove(skillbutton.get(i));
@@ -735,13 +749,7 @@ public class Myarena extends POOArena{
 		skillbutton.get(i).setEnabled(false);
 	    }
 	    end=false;
-	    try {
-		Thread.sleep(3000);
-	    } catch (InterruptedException e) {
-		// TODO Auto-generated catch block
-		System.exit(0);
-	    }
-	    System.exit(0);
+	    this.fight();
 	}
     }
 }

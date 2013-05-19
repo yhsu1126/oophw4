@@ -13,8 +13,8 @@ public class Dragonrider extends Mypet{
     public Dragonrider() throws IOException
     {
 	int i;
-	hp=120;
-	maxhp=120;
+	hp=200;
+	maxhp=200;
 	agility=90;
 	ap=9;
 	mp=5;
