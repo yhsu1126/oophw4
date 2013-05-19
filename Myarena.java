@@ -1,6 +1,7 @@
 import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -15,7 +16,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Random;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -34,15 +38,18 @@ import ntu.csie.oop13spring.POOPet;
 public class Myarena extends POOArena{
     private JFrame frame;
     private Board place;
+    private ArrayList<JButton> skillbutton = new ArrayList<JButton>();
     private JLabel lportrait,infopanel,skillpanel;
     private JTextArea log;
     private JScrollPane gameprogress;
     private ImageIcon fullportrait;
     private String subscription;
-    private int state,finished,index;
+    private int state,finished,index,mindamage,maxdamage,minrange,maxrange,pattern,cost,type,special;
     private Mycoordinate focuspos,cursorpos;
     private ArrayList<Mypet> Mypetlist= new ArrayList<Mypet>();
     private boolean end;
+    private String skillname;
+    Random randonumber=new Random();
     GCFrame scene;
     String gamelog="Welcome to POOArena!!\n";
     public Myarena() throws IOException
@@ -107,7 +114,7 @@ public class Myarena extends POOArena{
 	frame.add(place,c1);
 	place.setarena(this);
 	//add choose panel
-	skillpanel = new JLabel("Skill Panel");
+	skillpanel = new JLabel();
 	c1.gridwidth = 3;
 	c1.gridheight = 4;
 	c1.anchor = GridBagConstraints.EAST;
@@ -158,19 +165,92 @@ public class Myarena extends POOArena{
 	// finish placing
 	for(i=0;i<Mypetlist.size();i++)
 	{
-	    place.placeicon(Mypetlist.get(i).getcoordinate().getx(), Mypetlist.get(i).getcoordinate().gety(), Mypetlist.get(i).getportrait());
+	    place.placeicon(Mypetlist.get(i).getcoordinate().getx(), Mypetlist.get(i).getcoordinate().gety(), Mypetlist.get(i).getportrait(),i+1);
 	}
 	index=0;
 	while(true)
 	{
 	    focuspos=Mypetlist.get(index).getcoordinate();
 	    this.appendlog(Mypetlist.get(index).getname()+" turn\n");
+	    for(i=0;i<skillbutton.size();i++)
+		{
+		    skillpanel.remove(skillbutton.get(i));
+		}
+	    skillbutton.clear();
+		skillpanel.revalidate();
+		skillpanel.repaint();
+		skillpanel.setLayout(new BoxLayout(skillpanel,BoxLayout.Y_AXIS));
+		skillpanel.invalidate();
+		if(Mypetlist.get(index).action.size()!=0)
+		{
+		    for(i=0;i<Mypetlist.get(index).action.size();i++)
+		    {
+			JButton innertmp=new JButton(Mypetlist.get(index).action.get(i).name);
+			innertmp.setToolTipText(Mypetlist.get(index).action.get(i).description);
+			innertmp.setAlignmentX(Component.CENTER_ALIGNMENT);
+			final Myskill tmpskill=Mypetlist.get(index).action.get(i);
+			innertmp.addActionListener(new ActionListener(){
+
+			    @Override
+			    public void actionPerformed(ActionEvent e) {
+				if(Mypetlist.get(place.buttonmanager[focuspos.getx()*8+focuspos.gety()].getstate()-1).getap()>=tmpskill.cost)
+				{
+				    changetostate2(tmpskill.minmulti,tmpskill.maxmulti,tmpskill.pattern,tmpskill.minrange,tmpskill.maxrange,tmpskill.cost,tmpskill.type,tmpskill.name,0);
+				}
+				else
+				{
+				    appendlog("Not enough action point to do the action\n");
+				    Object tmp=e.getSource();
+				    if(tmp instanceof JButton)
+				    {
+					((JButton) tmp).setEnabled(false);
+				    }
+				}
+			    }
+			});
+			skillpanel.add(innertmp);
+			skillbutton.add(innertmp);
+			skillpanel.add(Box.createRigidArea(new Dimension(30,0)));
+		    }
+		}
+		JButton tmp=new JButton("Cancel");
+		tmp.setToolTipText("Cancel the action");
+		tmp.setAlignmentX(Component.CENTER_ALIGNMENT);
+		tmp.addActionListener(new ActionListener(){
+
+		    @Override
+		    public void actionPerformed(ActionEvent e) {
+			if(state==2)
+			{
+			place.removeblanket();
+			state=1;
+			}
+		    }
+		});
+		skillpanel.add(tmp);
+		skillbutton.add(tmp);
+		tmp=new JButton("End turn");
+		tmp.setToolTipText("End the turn immediately");
+		tmp.setAlignmentX(Component.CENTER_ALIGNMENT);
+		tmp.addActionListener(new ActionListener(){
+
+		    @Override
+		    public void actionPerformed(ActionEvent e) {
+			place.removeblanket();
+			state=1;
+			setfinished(1);
+		    }
+		    
+		});
+		skillpanel.add(tmp);
+		skillbutton.add(tmp);
+		skillpanel.revalidate();
 	    finished=0;
 	    state=1;
 	    // state 1 waiting for command, state 2 doing skill;
 	    while(finished==0)
 	    {
-		if(Mypetlist.get(index).getmp()==0)
+		if(Mypetlist.get(index).getmp()==0 && Mypetlist.get(index).getap()==0)
 		{
 		    System.out.printf("");
 		    finished=1;
@@ -181,6 +261,7 @@ public class Myarena extends POOArena{
 		}
 	    }
 	    Mypetlist.get(index).setmp(Mypetlist.get(index).getmaxmp());
+	    Mypetlist.get(index).setap(Mypetlist.get(index).getmaxap());
 	    index++;
 	    index%=Mypetlist.size();
 	}
@@ -203,20 +284,20 @@ public class Myarena extends POOArena{
 	if(this.state==1)
 	{
 	    int i,j;
-	    if(place.buttonmanager[a.getx()*8+a.gety()].getstate()!=1)
+	    if(place.buttonmanager[a.getx()*8+a.gety()].getstate()==0)
 	    {
 		int dis=this.Manhattan(a, this.focuspos);
 		if(dis<=this.Mypetlist.get(index).getmp())
 		{
 		    this.appendlog("move to "+"( "+a.getx()+" , "+a.gety()+" )"+"\n");
 		    place.removeicon(focuspos.getx(), focuspos.gety());
-		    place.placeicon(a.getx(), a.gety(), Mypetlist.get(index).getportrait());
+		    place.placeicon(a.getx(), a.gety(), Mypetlist.get(index).getportrait(),this.index+1);
 		    this.focuspos=a;
 		    Mypetlist.get(index).setcoordinate(focuspos);
 		    Mypetlist.get(index).setmp(this.Mypetlist.get(index).getmp()-dis);
-		    if(this.Mypetlist.get(index).getmp()==0)
+		    if(fullportrait==Mypetlist.get(index).fullportrait)
 		    {
-			finished=1;
+			infopanel.setText(Mypetlist.get(index).showdescrption());
 		    }
 		}
 		else
@@ -227,15 +308,202 @@ public class Myarena extends POOArena{
 	    else
 	    {
 		//this.appendlog("Illegal move, a pet is at there\n");
-		this.appendlog("Illegalmove :( "+a.getx()+" , "+a.gety()+" )"+place.buttonmanager[a.getx()*8+a.gety()].getstate()+"\n");
+		this.appendlog("Illegal move, someone is at that spot\n");
 	    }
 	}
+	else if(this.state==2)
+	{
+	    int i,j,dis=this.Manhattan(this.cursorpos, this.focuspos),damage;
+	    if(dis<=maxrange && dis>=minrange)
+	    {
+		this.appendlog("use "+this.skillname+" at "+"( "+a.getx()+" , "+a.gety()+" )"+"\n");
+		int multi=this.randonumber.nextInt(this.maxdamage-this.mindamage)+this.mindamage;
+		int patk=this.Mypetlist.get(index).getpatk(),matk=this.Mypetlist.get(index).getmatk();
+		if(type==1) // patk
+		{
+		    damage=patk*multi/100;
+		}
+		else if(type==2) //matk
+		{
+		    damage=matk*multi/100;
+		}
+		else if (type==3) // heal
+		{
+		    damage=matk*multi/100*-1;
+		}
+		else
+		{
+		    damage=0;
+		}
+		if(pattern==1)
+		{
+		    if(place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()>0)
+		    {
+			if(type==1)
+			{
+			    this.appendlog("dealing "+damage+" physical damage to \n"+Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).getname()+"\n");
+			    Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).sethp(Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).gethp()-damage);
+			}
+			else if(type==2)
+			{
+			    this.appendlog("dealing "+damage+" magical damage to \n"+Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).getname()+"\n");
+			    Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).sethp(Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).gethp()-damage);
+			}
+			else if(type==3)
+			{
+			    this.appendlog("recover "+damage*-1+" hp to \n"+Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()).getname()+"\n");
+			    Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).sethp(Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).gethp()-damage);
+			    if(Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).gethp()>Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).getmaxhp())
+			    {
+				Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).sethp(Mypetlist.get(this.place.buttonmanager[cursorpos.getx()*8+cursorpos.gety()].getstate()-1).getmaxhp());
+			    }
+			}
+		    }
+		    else
+		    {
+			if(type==1)
+			{
+			    this.appendlog("dealing 0 physical damage to the air!!!!\n");
+			}
+			else if(type==2)
+			{
+			    this.appendlog("dealing 0 magical damage to the air!!!!!\n");
+			}
+			else if(type==3)
+			{
+			    this.appendlog("recover 0 hp for the air!!!!\n");
+			}
+		    }
+		}
+		else if(pattern==2)
+		{
+		    int[] xshift={0,-1,1,0};
+		    int[] yshift={1,0,0,-1};
+		    int x,y,total=0;
+		    for(i=0;i<4;i++)
+		    {
+			x=cursorpos.getx()+xshift[i];
+			y=cursorpos.gety()+yshift[i];
+			if(x<8 && x>=0 && y<8 && y>=0)
+			{
+			    if(place.buttonmanager[x*8+y].getstate()>0)
+			    {
+				total=1;
+				if(type==1)
+				{
+				    this.appendlog("dealing "+damage+" physical damage to \n"+Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).getname()+"\n");
+				    Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).sethp(Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).gethp()-damage);
+				}
+				else if(type==2)
+				{
+				    this.appendlog("dealing "+damage+" magical damage to \n"+Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).getname()+"\n");
+				    Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).sethp(Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).gethp()-damage);
+				}
+				else if(type==3)
+				{
+				    this.appendlog("recover "+damage*-1+" hp to \n"+Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()).getname()+"\n");
+				    Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).sethp(Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).gethp()-damage);
+				    if(Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).gethp()>Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).getmaxhp())
+				    {
+					Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).sethp(Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).getmaxhp());
+				    }
+				}
+			    }
+			}
+		    }
+		    if(total==0)
+		    {
+			if(type==1)
+			{
+			    this.appendlog("dealing 0 physical damage to\n"+"WHOLE LOT OF air!!!!\n");
+			}
+			else if(type==2)
+			{
+			    this.appendlog("dealing 0 magical damage to\n"+"WHOLE LOT OF air!!!!!\n");
+			}
+			else if(type==3)
+			{
+			    this.appendlog("recover 0 hp for\n"+"WHOLE LOT OF air!!!!\n");
+			}
+		    }
+		}
+		else if(pattern==3)
+		{
+		    int[] xshift={-1,0,1,-1,1,-1,0,1};
+		    int[] yshift={-1,-1,-1,0,0,1,1,1};
+		    int x,y,total=0;
+		    for(i=0;i<8;i++)
+		    {
+			x=cursorpos.getx()+xshift[i];
+			y=cursorpos.gety()+yshift[i];
+			if(x<8 && x>=0 && y<8 && y>=0)
+			{
+			    if(place.buttonmanager[x*8+y].getstate()>0)
+			    {
+				total=1;
+				if(type==1)
+				{
+				    this.appendlog("dealing "+damage+" physical damage to \n"+Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).getname()+"\n");
+				    Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).sethp(Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).gethp()-damage);
+				}
+				else if(type==2)
+				{
+				    this.appendlog("dealing "+damage+" magical damage to \n"+Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).getname()+"\n");
+				    Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).sethp(Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).gethp()-damage);
+				}
+				else if(type==3)
+				{
+				    this.appendlog("recover "+damage*-1+" hp to \n"+Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()).getname()+"\n");
+				    Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).sethp(Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).gethp()-damage);
+				    if(Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).gethp()>Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).getmaxhp())
+				    {
+					Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).sethp(Mypetlist.get(this.place.buttonmanager[x*8+y].getstate()-1).getmaxhp());
+				    }
+				}
+			    }
+			}
+		    }
+		    if(total==0)
+		    {
+			if(type==1)
+			{
+			    this.appendlog("dealing 0 physical damage to\n"+"WHOLE LOT OF air!!!!\n");
+			}
+			else if(type==2)
+			{
+			    this.appendlog("dealing 0 magical damage to\n"+"WHOLE LOT OF air!!!!!\n");
+			}
+			else if(type==3)
+			{
+			    this.appendlog("recover 0 hp for\n"+"WHOLE LOT OF air!!!!\n");
+			}
+		    }
+		}
+		Mypetlist.get(index).setap(Mypetlist.get(index).getap()-cost);
+		this.place.removeblanket();
+		this.state=1;
+	    }
+	}
+    }
+    public void changetostate2(int mindamage,int maxdamage,int pattern,int minrange,int maxrange,int cost,int type,String skillname,int special)
+    {
+	    this.state=2;
+	    this.mindamage=mindamage;
+	    this.maxdamage=maxdamage;
+	    this.pattern=pattern;
+	    this.minrange=minrange;
+	    this.maxrange=maxrange;
+	    this.cost=cost;
+	    this.type=type;
+	    this.skillname=skillname;
+	    this.special=special;
+	    place.setBlanket(minrange,maxrange,this.focuspos);
     }
     public void cursorchange(Mycoordinate a)
     {
 	this.cursorpos=a;
 	int i;
-	if(place.buttonmanager[a.getx()*8+a.gety()].getstate()==1)
+	if(place.buttonmanager[a.getx()*8+a.gety()].getstate()>0)
 	{
 	    for(i=0;i<Mypetlist.size();i++)
 	    {
@@ -248,6 +516,47 @@ public class Myarena extends POOArena{
 	    this.lportrait.setIcon(fullportrait);
 	    this.infopanel.setText(Mypetlist.get(i).showdescrption());
 	    this.infopanel.repaint();
+	}
+	if(this.state==2)
+	{
+	    int distance=this.Manhattan(this.focuspos, this.cursorpos);
+	    if(distance>=minrange && distance<=maxrange)
+	    {
+		place.setBlanket(minrange,maxrange,this.focuspos);
+		place.buttonmanager[this.cursorpos.getx()*8+this.cursorpos.gety()].setBackground(new Color(158,225,237,200));
+		if(pattern==3)
+		{
+		    int[] xshift={-1,0,1,-1,1,-1,0,1};
+		    int[] yshift={-1,-1,-1,0,0,1,1,1};
+		    int x,y;
+		    for(i=0;i<8;i++)
+		    {
+			x=cursorpos.getx()+xshift[i];
+			y=cursorpos.gety()+yshift[i];
+			if(x<8 && x>=0 && y<8 && y>=0)
+			{
+			    place.buttonmanager[x*8+y].setBackground(new Color(158,225,237,200));
+			    place.buttonmanager[x*8+y].setBorderPainted(true);
+			}
+		    }
+		}
+		else if(pattern==2)
+		{
+		    int[] xshift={0,-1,1,0};
+		    int[] yshift={1,0,0,-1};
+		    int x,y;
+		    for(i=0;i<8;i++)
+		    {
+			x=cursorpos.getx()+xshift[i];
+			y=cursorpos.gety()+yshift[i];
+			if(x<8 && x>=0 && y<8 && y>=0)
+			{
+			    place.buttonmanager[x*8+y].setBackground(new Color(158,225,237,200));
+			    place.buttonmanager[x*8+y].setBorderPainted(true);
+			}
+		    }
+		}
+	    }
 	}
     }
     /*public Mycoordinate getPosition(POOPet p)
@@ -272,7 +581,7 @@ class GCFrame extends JPanel implements ActionListener {
        super();
        this.setOpaque(false);
        this.setBackground(new Color(0,0,0,200));
-       timer.start();
+       //timer.start();
     }
 
     public void paint(Graphics g) {
@@ -296,23 +605,15 @@ class GCFrame extends JPanel implements ActionListener {
 
   }
   class Mymouselistener implements MouseListener{
-    private int state;
     private innergamelabel controller=null;
     Mymouselistener (innergamelabel a)
     {
 	this.controller=a;
     }
-    public void setstate(int a)
-    {
-	this.state=a;
-    }
     @Override
     public void mouseClicked(MouseEvent e) {
 	// TODO Auto-generated method stub
-	if(this.state==1)
-	{
 	    this.controller.tellarenaclick();
-	}
     }
 
     @Override
@@ -368,10 +669,6 @@ class GCFrame extends JPanel implements ActionListener {
       {
 	  this.state=a;
       }
-      public void setlistenerstate(int a)
-      {
-	  this.manager.setstate(a);
-      }
       public int getstate()
       {
 	  return this.state;
@@ -395,6 +692,10 @@ class GCFrame extends JPanel implements ActionListener {
     public void tellarenacursor()
     {
 	this.arena.cursorchange(this.pos);
+    }
+    public Mycoordinate getpos()
+    {
+	return this.pos;
     }
   }
   class Board extends JLabel
@@ -440,14 +741,13 @@ class GCFrame extends JPanel implements ActionListener {
 	this.setOpaque(false);
 	this.setPreferredSize(new Dimension(600,600));
 	this.setVisible(true);
-	this.setlistener(1);
       }
-      public void placeicon(int x,int y,ImageIcon icon)
+      public void placeicon(int x,int y,ImageIcon icon,int index)
       {
 	  this.buttonmanager[x*8+y].setIcon(icon);
 	  this.buttonmanager[x*8+y].setOpaque(true);
 	  this.buttonmanager[x*8+y].paintImmediately(0, 0, 75, 75);
-	  this.buttonmanager[x*8+y].setstate(1);
+	  this.buttonmanager[x*8+y].setstate(index);
 	  this.paintImmediately(0, 0, 600, 600);
       }
       public void removeicon(int x, int y)
@@ -474,13 +774,35 @@ class GCFrame extends JPanel implements ActionListener {
 	      this.buttonmanager[i].setstate(a);
 	  }
       }
-      public void setlistener(int a)
+      public void setBlanket(int minrange, int maxrange,Mycoordinate pos)
       {
 	  int i;
 	  for(i=0;i<64;i++)
 	  {
-	      this.buttonmanager[i].setlistenerstate(a);
+	      if(this.Manhattan(this.buttonmanager[i].getpos(), pos)>maxrange || this.Manhattan(this.buttonmanager[i].getpos(), pos)<minrange)
+	      {
+	      this.buttonmanager[i].setBackground(new Color(25, 25, 25, 185));
+	      this.buttonmanager[i].setBorderPainted(false);
+	      }
+	      else
+	      {
+		  this.buttonmanager[i].setBackground(new Color(192, 192, 192, 200));
+		  this.buttonmanager[i].setBorderPainted(true);
+	      }
 	  }
+      }
+      public void removeblanket()
+      {
+	  int i;
+	  for(i=0;i<64;i++)
+	  {
+	      this.buttonmanager[i].setBackground(new Color(192, 192, 192, 200));
+	      this.buttonmanager[i].setBorderPainted(true);
+	  }
+      }
+      public int Manhattan(Mycoordinate source,Mycoordinate destin)
+      {
+  	return Math.abs(source.getx()-destin.getx())+Math.abs(source.gety()-destin.gety());
       }
   }
   

@@ -7,7 +7,8 @@ public class Myskill extends POOSkill {
     @Override
     public void act(POOPet pet) {
 	// TODO Auto-generated method stub
-	
+	return;
     }
-
+    protected int minrange, maxrange,type,maxmulti,minmulti,cost,pattern,state,proc;// if state !=0 set proc
+    String name,description;
 }

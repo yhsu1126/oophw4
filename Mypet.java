@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 import javax.swing.ImageIcon;
 
 import ntu.csie.oop13spring.POOAction;
@@ -7,8 +9,9 @@ import ntu.csie.oop13spring.POOPet;
 
 
 class Mypet extends POOPet {
-    protected int hp,maxhp,ap,maxap,mp,maxmp,state,agility,nation,patk,matk,pdef,mdef;
-    protected int[] turn =new int[32];
+    protected int hp,maxhp,ap,maxap,mp,maxmp,agility,nation,patk,matk,pdef,mdef;
+    protected int[] stateaccu=new int[32];
+    public ArrayList<Myskill> action=new ArrayList<Myskill>();
     String subscription,name;
     ImageIcon portrait, fullportrait;
     private Mycoordinate pos;
@@ -21,14 +24,6 @@ class Mypet extends POOPet {
     protected POOCoordinate move(POOArena arena) {
 	// TODO Auto-generated method stub
 	return null;
-    }
-    public void setstate(int a)
-    {
-	this.state=a;
-    }
-    public int getstate()
-    {
-	return this.state;
     }
     public void setap(int a)
     {
@@ -93,6 +88,18 @@ class Mypet extends POOPet {
     public ImageIcon getportrait()
     {
 	return this.portrait;
+    }
+    public int getpatk()
+    {
+	return this.patk;
+    }
+    public int getmatk()
+    {
+	return this.matk;
+    }
+    public int getmaxhp()
+    {
+	return this.maxhp;
     }
     public String showdescrption()
     {

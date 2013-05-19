@@ -20,7 +20,6 @@ public class paladin extends Mypet{
 	mp=4;
 	maxap=6;
 	maxmp=4;
-	state=0;
 	nation=1;
 	patk=20;
 	matk=0;
@@ -29,10 +28,6 @@ public class paladin extends Mypet{
 	portrait=new ImageIcon();
 	fullportrait=new ImageIcon();
 	name="Peacebringer";
-	for(i=0;i<32;i++)
-	{
-	    turn[i]=0;
-	}
 	this.setcoordinate(new Mycoordinate(3,0));
 	name="Holy paladin";
 	subscription="Knight that know the knowledge of<br/>light magic<br/>";
